@@ -13,7 +13,7 @@ function showHeroSlide(n) {
 }
 
 function startSlider() {
-  heroInterval = setInterval(() => showHeroSlide(heroIdx + 1), 7000);
+  heroInterval = setInterval(() => showHeroSlide(heroIdx + 1), 8000);
 }
 
 heroDots.forEach((dot, index) => {
