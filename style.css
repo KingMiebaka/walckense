@@ -49,6 +49,11 @@ a {
   }
 }
 
+.section-header h2 {
+    color:var(--text) !important;
+
+}
+
 /* ==========================================================================
    NAVIGATION & HEADER
    ========================================================================== */
@@ -145,11 +150,16 @@ a {
 .nav-item::after {
   height: 0;
 }
+.nav-drawer{
+  width: 20% !important;
 }
+}
+@media (max-width: 767px) {
 
-
-
-
+.nav-drawer{
+  width: 40% !important;
+}
+}
 
 /* ==========================================================================
    BUTTONS
@@ -422,94 +432,138 @@ a {
   font-weight: 800;
 }
 
+
+@media (max-width: 768px) {
+    .mission-wrapper, .about-flex {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ==========================================================================
-   ABOUT SECTION (Image & Stats)
+   ENHANCED ABOUT SECTION
    ========================================================================== */
 .about-section {
   padding: 120px 0;
   background-color: var(--white);
-  color: var(--text);
 }
 
-.about-section .main-title {
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 60px;
+  align-items: center;
+  margin-bottom: 80px;
+}
+
+.main-title-dark {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  color: var(--navy);
+  margin: 15px 0 25px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.about-description p {
+  color: #475569;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  margin-bottom: 20px;
+}
+
+.about-description .lead {
+  font-size: 1.2rem;
+  font-weight: 600;
   color: var(--navy);
 }
 
-.about-section .lead {
-  color: var(--text);
+/* Experience Badge */
+.about-visual {
+  display: flex;
+  justify-content: center;
 }
 
-.pillar-card p {
-  color: #454b53;
-  line-height: 1.6;
-  font-size: 0.95rem;
+.experience-badge {
+  background: var(--navy);
+  color: var(--white);
+  padding: 40px;
+  border-radius: 20px;
+  border-right: 8px solid var(--gold);
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
 }
 
-.section-header h2 {
-  color: #444950;
-}
-
-/* Part 1: Narrative Layout */
-.overline {
+.experience-badge .years {
+  display: block;
+  font-size: 4rem;
+  font-weight: 800;
   color: var(--gold);
+  line-height: 1;
+}
+
+.experience-badge .text {
   text-transform: uppercase;
   letter-spacing: 2px;
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
-.main-title {
-  font-size: 2.8rem;
-  margin: 20px 0;
-  color: #fff;
-}
-
-/* Part 2: Pillars Grid */
+/* Pillars */
 .about-pillars {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 50px;
+}
+
+.pillar-card {
+  background: var(--bg);
+  padding: 40px 30px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
+}
+
+.pillar-card:hover {
+  transform: translateY(-10px);
+  background: var(--white);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+  border-color: var(--gold);
+}
+
+.pillar-icon {
+  font-size: 1.5rem;
+  color: var(--gold);
+  margin-bottom: 20px;
 }
 
 .pillar-card h3 {
-  color: var(--gold);
+  color: var(--navy);
+  font-size: 1.25rem;
   margin-bottom: 15px;
-  font-size: 1.2rem;
 }
 
 .pillar-card p {
-  line-height: 1.6;
+  color: #64748b;
   font-size: 0.95rem;
+  line-height: 1.6;
 }
 
-/* Responsive adjustment */
-@media (max-width: 900px) {
-  .about-narrative {
+/* Mobile Responsiveness */
+@media (max-width: 992px) {
+  .about-grid {
     grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
   }
-
+  
   .about-pillars {
     grid-template-columns: 1fr;
   }
 
-  @media (max-width: 768px) {
-  .about-section {
-        padding: 80px 0px !important;
-    }
-}
-}
-
-
-@media (max-width: 768px) {
-
-  .mission-wrapper,
-  .about-flex {
-    grid-template-columns: 1fr;
+  .experience-badge {
+    width: 100%;
+    max-width: 300px;
   }
 }
-
 /* ==========================================================================
    SERVICES SECTION
    ========================================================================== */
@@ -857,39 +911,42 @@ a {
 }
 
 /* ==========================================================================
-   INNOVATION SECTION
+   INNOVATION SECTION - 2x2 GRID
    ========================================================================== */
 .innovation-section {
   padding: 100px 0;
-  background: #f8fafc;
+  background-color: #fcfcfc;
 }
 
 .innovation-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  /* Forces 2 columns for Desktop and Tablets */
+  grid-template-columns: repeat(2, 1fr);
   gap: 30px;
   margin-top: 50px;
-}
-
-.section-header h2 {
-    color:var(--text) !important;
+  max-width: 1000px; /* Keeps the grid tight and professional */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .innov-card {
   background: var(--white);
   padding: 40px;
-  border-radius: 12px;
-  border-bottom: 4px solid var(--gold);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .innov-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
+  border-color: var(--gold);
 }
 
-.icon-box {
+.innov-card .icon-box {
   width: 50px;
   height: 50px;
   background: rgba(194, 138, 62, 0.1);
@@ -897,30 +954,56 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  font-size: 1.5rem;
+  border-radius: 6px;
+  font-size: 1.4rem;
   margin-bottom: 25px;
 }
 
 .innov-card h3 {
   font-size: 1.25rem;
-  color: var(--navy);
   margin-bottom: 15px;
-  line-height: 1.4;
+  color: var(--navy);
 }
 
 .innov-card p {
   font-size: 0.95rem;
-  line-height: 1.7;
-  color: #475569;
+  line-height: 1.6;
+  color: #64748b;
+  margin-bottom: 0;
 }
 
-@media (max-width: 768px) {
+.card-accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: var(--gold);
+  transition: width 0.4s ease;
+}
+
+.innov-card:hover .card-accent {
+  width: 100%;
+}
+
+/* --- Responsive Breakpoints --- */
+@media (max-width: 992px) {
   .innovation-grid {
-    grid-template-columns: 1fr;
+    padding: 0 20px; /* Padding for tablets */
   }
 }
 
+@media (max-width: 600px) {
+  .innovation-grid {
+    /* Collapses to 1 column for Phones */
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .innov-card {
+    padding: 30px;
+  }
+}
 /* ==========================================================================
    PROJECT SECTION
    ========================================================================== */
@@ -1060,8 +1143,16 @@ a {
   
   .nav-btn.prev { left: 5px; }
   .nav-btn.next { right: 5px; }
+
+  .project-showcase .description {
+  
+    line-height: 1.2;
 }
 
+.project-info {
+  padding:0;
+}
+}
 /* ==========================================================================
    CLIENT SECTION
    ========================================================================== */
@@ -1420,6 +1511,12 @@ a {
 
   }
 }
+
+.section-header h2 {
+    color:var(--text) !important;
+}
+
+
 
 
 
