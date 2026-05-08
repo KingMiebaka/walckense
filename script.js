@@ -98,7 +98,52 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+
+    /* ... existing code (A. Navigation, B. Scroll Effects, C. Form Logic) ... */
+
+    if (contactForm) {
+        contactForm.addEventListener("submit", async (event) => {
+            // ... existing form submission logic ...
+        });
+    }
+
+    // --- NEW: Publication Filtering & Search Logic ---
+    const searchInput = document.getElementById('articleSearch');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const articles = document.querySelectorAll('.article-card');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            articles.forEach(article => {
+                const title = article.querySelector('h3').innerText.toLowerCase();
+                // Shows the article if the title matches the search term
+                article.style.display = title.includes(term) ? 'block' : 'none';
+            });
+        });
+    }
+
+    if (filterBtns.length > 0) {
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // UI: Update active button state
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Filter Logic
+                const filter = btn.dataset.filter;
+                articles.forEach(article => {
+                    if (filter === 'recent' || article.dataset.category === filter) {
+                        article.style.display = 'block';
+                    } else {
+                        article.style.display = 'none';
+                    }
+                });
+            });
+        });
+    }
+}); // This is the existing closing bracket for DOMContentLoaded
+
 
 // D. Global Reset (Used by Success Message button)
 window.resetForm = function() {
