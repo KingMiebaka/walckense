@@ -5,30 +5,118 @@ const heroDots = document.querySelectorAll('.dot');
 let heroInterval;
 
 function showHeroSlide(n) {
-  heroSlides.forEach(s => s.classList.remove('active'));
-  heroDots.forEach(d => d.classList.remove('active'));
-  heroIdx = (n + heroSlides.length) % heroSlides.length;
-  heroSlides[heroIdx].classList.add('active');
-  heroDots[heroIdx].classList.add('active');
+    if (!heroSlides.length) return;
+    heroSlides.forEach(s => s.classList.remove('active'));
+    heroDots.forEach(d => d.classList.remove('active'));
+    heroIdx = (n + heroSlides.length) % heroSlides.length;
+    heroSlides[heroIdx].classList.add('active');
+    heroDots[heroIdx].classList.add('active');
 }
 
 function startSlider() {
-  heroInterval = setInterval(() => showHeroSlide(heroIdx + 1), 8000);
+    if (!heroSlides.length) return;
+    heroInterval = setInterval(() => showHeroSlide(heroIdx + 1), 8000);
 }
 
 heroDots.forEach((dot, index) => {
-  dot.addEventListener('click', () => {
-    clearInterval(heroInterval);
-    showHeroSlide(index);
-    startSlider();
-  });
+    dot.addEventListener('click', () => {
+        clearInterval(heroInterval);
+        showHeroSlide(index);
+        startSlider();
+    });
 });
 startSlider();
 
-// --- 2. Combined Site Logic (Navbar, Drawer, Form, Scroll) ---
+// --- 2. Combined Site Logic (Navbar, Drawer, Form, Scroll, Publications) ---
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // A. Navigation & Mobile Drawer
+
+    // --- A. ARTICLE DATABASE: ADD YOUR NEW ARTICLES HERE EVERY DAY ---
+    const articlesData = [
+        {
+            title: "Optimizing Decentralized Wastewater Systems",
+            date: "MAY 2026",
+            category: "WASH INFRASTRUCTURE",
+            excerpt: "An analysis of modular STP performance under variable hydraulic loading in African metropolitan areas.",
+            link: "#", 
+            type: "recent", // Options: "recent", "most-read", "case-study"
+            isNew: true     // Adds a "NEW" badge automatically
+        },
+        {
+            title: "Climate-Resilient Utility Systems: A 5-Year Outlook",
+            date: "APRIL 2026",
+            category: "CLIMATE RESILIENCE",
+            excerpt: "Strategies for future-proofing mechanical assets against extreme weather and resource scarcity.",
+            link: "#",
+            type: "most-read",
+            isNew: false
+        },
+        {
+            title: "Predictive Maintenance in Fluid Management",
+            date: "MARCH 2026",
+            category: "HYDROINFORMATICS",
+            excerpt: "How AI-assisted modeling reduced operational downtime in industrial pump stations by 30%.",
+            link: "#",
+            type: "recent",
+            isNew: false
+        }
+    ];
+
+    // --- B. Publication Rendering Logic ---
+    const articleGrid = document.getElementById('articleGrid');
+
+// Function to render articles to the page
+    function renderArticles(data) {
+        if (!articleGrid) return;
+        
+        // UPDATE THE LINE BELOW:
+        articleGrid.innerHTML = data.map((article, index) => `
+            <article class="article-card" data-type="${article.type}">
+                <div class="article-meta">
+                    <span class="date">${article.date}</span>
+                    <span class="category">${article.category}</span>
+                </div>
+                <h3>
+                    ${article.title} 
+                    ${index === 0 ? '<span class="new-badge">NEW</span>' : ''} 
+                </h3>
+                <p>${article.excerpt}</p>
+                <div class="card-footer">
+                    <span class="type-tag">${article.type.replace('-', ' ')}</span>
+                    <a href="${article.link}" class="read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </article>
+        `).join('');
+    }
+
+    // Initialize Articles
+    renderArticles(articlesData);
+
+    // --- C. Search & Filter Logic ---
+    const searchInput = document.getElementById('articleSearch');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = articlesData.filter(art => 
+                art.title.toLowerCase().includes(term) || 
+                art.category.toLowerCase().includes(term)
+            );
+            renderArticles(filtered);
+        });
+    }
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filter = btn.dataset.filter;
+            const filtered = filter === 'all' ? articlesData : articlesData.filter(art => art.type === filter);
+            renderArticles(filtered);
+        });
+    });
+
+    // --- D. Navigation & Mobile Drawer ---
     const navToggle = document.getElementById('navToggle');
     const navDrawer = document.getElementById('navDrawer');
     const closeDrawer = document.getElementById('closeDrawer');
@@ -40,13 +128,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     if (closeDrawer) closeDrawer.addEventListener('click', () => navDrawer.classList.remove('open'));
-    
 
-    // B. Scroll Effects (Navbar Background & Active State)
+    // --- E. Scroll Effects (Navbar Background & Active State) ---
     window.addEventListener('scroll', () => {
         const header = document.getElementById('mainHeader');
-        // This handles the background color change on scroll
-        header.classList.toggle('scrolled', window.scrollY > 50);
+        if (header) header.classList.toggle('scrolled', window.scrollY > 50);
 
         const sections = document.querySelectorAll('section');
         const navLinks = document.querySelectorAll('.nav-item');
@@ -67,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // C. Form Submission Logic
+    // --- F. Form Submission Logic ---
     const contactForm = document.getElementById("contactForm");
     const formSuccess = document.getElementById("formSuccess");
     const submitBtn = document.getElementById("submitBtn");
@@ -98,73 +184,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+});
 
-    /* ... existing code (A. Navigation, B. Scroll Effects, C. Form Logic) ... */
-
-    if (contactForm) {
-        contactForm.addEventListener("submit", async (event) => {
-            // ... existing form submission logic ...
-        });
-    }
-
-    // --- NEW: Publication Filtering & Search Logic ---
-    const searchInput = document.getElementById('articleSearch');
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const articles = document.querySelectorAll('.article-card');
-
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            articles.forEach(article => {
-                const title = article.querySelector('h3').innerText.toLowerCase();
-                // Shows the article if the title matches the search term
-                article.style.display = title.includes(term) ? 'block' : 'none';
-            });
-        });
-    }
-
-    if (filterBtns.length > 0) {
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // UI: Update active button state
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                // Filter Logic
-                const filter = btn.dataset.filter;
-                articles.forEach(article => {
-                    if (filter === 'recent' || article.dataset.category === filter) {
-                        article.style.display = 'block';
-                    } else {
-                        article.style.display = 'none';
-                    }
-                });
-            });
-        });
-    }
-}); // This is the existing closing bracket for DOMContentLoaded
-
-
-// D. Global Reset (Used by Success Message button)
+// --- 3. Global Functions (Reset & Sliders) ---
 window.resetForm = function() {
     const contactForm = document.getElementById("contactForm");
     const formSuccess = document.getElementById("formSuccess");
     const submitBtn = document.getElementById("submitBtn");
 
-    formSuccess.style.display = "none";
-    contactForm.style.display = "block";
-    contactForm.reset();
-    submitBtn.textContent = "Send Request";
-    submitBtn.disabled = false;
+    if (formSuccess) formSuccess.style.display = "none";
+    if (contactForm) {
+        contactForm.style.display = "block";
+        contactForm.reset();
+    }
+    if (submitBtn) {
+        submitBtn.textContent = "Send Request";
+        submitBtn.disabled = false;
+    }
 };
 
-// --- 3. Project Slider ---
 function moveSlide(direction) {
     const slides = document.querySelectorAll('.project-slide');
     const active = document.querySelector('.project-slide.active');
+    if (!active) return;
     let idx = Array.from(slides).indexOf(active);
     active.classList.remove('active');
     let nextIdx = (idx + direction + slides.length) % slides.length;
     slides[nextIdx].classList.add('active');
 }
-
