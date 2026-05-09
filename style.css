@@ -321,7 +321,7 @@ a {
 
 
 /* ==========================================================================
-   HERO SLIDER
+   HERO SECTION
    ========================================================================== */
 .hero-slider {
   height: 100vh;
@@ -442,7 +442,7 @@ a {
 }
 
 /* ==========================================================================
-   ENHANCED ABOUT SECTION
+   ABOUT SECTION
    ========================================================================== */
 .about-section {
   padding: 120px 0;
@@ -1014,9 +1014,11 @@ a {
 .publications-page {
   background: var(--bg);
   min-height: 100vh;
-  padding-bottom: 100px;
 }
+/* .publications-page .nav-menu a{
+  color: var(--navy) ;
 
+} */
 .pub-section {
   padding: 60px 0;
 }
@@ -1753,3 +1755,4 @@ a {
     text-transform: uppercase;
     color: #94a3b8;
 }
+

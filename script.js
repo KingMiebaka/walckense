@@ -18,109 +18,183 @@ function startSlider() {
     heroInterval = setInterval(() => showHeroSlide(heroIdx + 1), 8000);
 }
 
-heroDots.forEach((dot, index) => {
-    dot.addEventListener('click', () => {
-        clearInterval(heroInterval);
-        showHeroSlide(index);
-        startSlider();
+if (heroDots.length > 0) {
+    heroDots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            clearInterval(heroInterval);
+            showHeroSlide(index);
+            startSlider();
+        });
     });
-});
-startSlider();
+    startSlider();
+}
 
-// --- 2. Combined Site Logic (Navbar, Drawer, Form, Scroll, Publications) ---
+// --- 2. Combined Site Logic ---
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- A. ARTICLE DATABASE: ADD YOUR NEW ARTICLES HERE EVERY DAY ---
-    const articlesData = [
-        {
-            title: "Optimizing Decentralized Wastewater Systems",
-            date: "MAY 2026",
-            category: "WASH INFRASTRUCTURE",
-            excerpt: "An analysis of modular STP performance under variable hydraulic loading in African metropolitan areas.",
-            link: "#", 
-            type: "recent", // Options: "recent", "most-read", "case-study"
-            isNew: true     // Adds a "NEW" badge automatically
-        },
-        {
-            title: "Climate-Resilient Utility Systems: A 5-Year Outlook",
-            date: "APRIL 2026",
-            category: "CLIMATE RESILIENCE",
-            excerpt: "Strategies for future-proofing mechanical assets against extreme weather and resource scarcity.",
-            link: "#",
-            type: "most-read",
-            isNew: false
-        },
-        {
-            title: "Predictive Maintenance in Fluid Management",
-            date: "MARCH 2026",
-            category: "HYDROINFORMATICS",
-            excerpt: "How AI-assisted modeling reduced operational downtime in industrial pump stations by 30%.",
-            link: "#",
-            type: "recent",
-            isNew: false
+    // --- A. CONFIGURATION ---
+    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQTR8GPTNFAzyr-6KCNLCxCbRZ94FrUdeZt-zM82AZ_yzuOcMOXM4r0mDUk2RCNHhA7V8G-PLJAWFJF/pub?gid=0&single=true&output=csv";
+    
+    // YOUR LIVE DEPLOYMENT URL
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-EBomxvCbu7HkNBntuUTkIx8daI1vfYGllLyTN3zSMTr4jHsfTv0DSbZDTH4WiqhfZA/exec"; 
+
+    // TRACKING FUNCTION: Sends click data to Google Sheets
+    window.trackClick = async function(title) {
+        try {
+            // Using no-cors mode to send the "ping" to the script
+            await fetch(`${APPS_SCRIPT_URL}?title=${encodeURIComponent(title)}`, { 
+                mode: 'no-cors' 
+            });
+        } catch (e) {
+            console.error("Tracking error:", e);
         }
-    ];
+    };
 
-    // --- B. Publication Rendering Logic ---
-    const articleGrid = document.getElementById('articleGrid');
+    // --- B. DYNAMIC ARTICLE LOADER ---
+    async function fetchPublications() {
+        const grid = document.getElementById('articleGrid');
+        if (!grid) return; 
 
-// Function to render articles to the page
-    function renderArticles(data) {
-        if (!articleGrid) return;
-        
-        // UPDATE THE LINE BELOW:
-        articleGrid.innerHTML = data.map((article, index) => `
-            <article class="article-card" data-type="${article.type}">
-                <div class="article-meta">
-                    <span class="date">${article.date}</span>
-                    <span class="category">${article.category}</span>
-                </div>
-                <h3>
-                    ${article.title} 
-                    ${index === 0 ? '<span class="new-badge">NEW</span>' : ''} 
-                </h3>
-                <p>${article.excerpt}</p>
-                <div class="card-footer">
-                    <span class="type-tag">${article.type.replace('-', ' ')}</span>
-                    <a href="${article.link}" class="read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+        try {
+            const response = await fetch(`${GOOGLE_SHEET_CSV_URL}&t=${new Date().getTime()}`);
+            if (!response.ok) throw new Error("Network response was not ok");
+            
+            const csvData = await response.text();
+            const rows = csvData.split('\n').slice(1);
+            
+            const articles = rows.map(row => {
+                const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                return {
+                    title: columns[0]?.replace(/"/g, ""),
+                    date: columns[1]?.replace(/"/g, ""),
+                    category: columns[2]?.replace(/"/g, ""),
+                    excerpt: columns[3]?.replace(/"/g, ""),
+                    link: columns[4]?.replace(/"/g, "").trim(),
+                    views: parseInt(columns[5]) || 0 // Maps Column F (6th column)
+                };
+            }).filter(art => art.title && art.title.trim() !== "");
+
+            if (articles.length === 0) {
+                grid.innerHTML = "<p>No publications found in the sheet.</p>";
+            } else {
+                displayArticles(articles);
+                setupSearchAndFilter(articles);
+            }
+        } catch (err) {
+            console.error("Database Error:", err);
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px;"><p>Error connecting to database.</p></div>`;
+        }
+    }
+
+    function displayArticles(data) {
+        const grid = document.getElementById('articleGrid');
+        if (!grid) return;
+
+        grid.innerHTML = data.map((art, index) => {
+            const safeTitle = art.title.replace(/'/g, "\\'"); // Escapes quotes for JS
+            return `
+            <article class="article-card">
+                <div class="article-content">
+                    <div class="article-meta">
+                        <span class="category">${art.category}</span>
+                        <span class="date">${art.date}</span>
+                    </div>
+                    <h3>${art.title} ${index === 0 ? '<span class="new-badge">NEW</span>' : ''}</h3>
+                    <p>${art.excerpt}</p>
+                    
+                    <a href="${art.link}" 
+                       class="read-more" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       onclick="trackClick('${safeTitle}')">
+                        View Report <i class="fas fa-file-pdf" style="margin-left: 8px; color: #c28a3e;"></i>
+                    </a>
                 </div>
             </article>
-        `).join('');
+        `}).join('');
     }
 
-    // Initialize Articles
-    renderArticles(articlesData);
+    function setupSearchAndFilter(allArticles) {
+        const searchInput = document.getElementById('articleSearch');
+        const filterBtns = document.querySelectorAll('.filter-btn');
 
-    // --- C. Search & Filter Logic ---
-    const searchInput = document.getElementById('articleSearch');
-    const filterBtns = document.querySelectorAll('.filter-btn');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = allArticles.filter(art => 
+                    art.title.toLowerCase().includes(term) || 
+                    art.category.toLowerCase().includes(term)
+                );
+                displayArticles(filtered);
+            });
+        }
 
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = articlesData.filter(art => 
-                art.title.toLowerCase().includes(term) || 
-                art.category.toLowerCase().includes(term)
-            );
-            renderArticles(filtered);
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const filterType = btn.dataset.filter;
+                let filtered = [...allArticles];
+
+                if (filterType === 'recent') {
+                    // Sort by Date (Descending)
+                    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+                } else if (filterType === 'most-read') {
+                    // Sort by Views (Descending)
+                    filtered.sort((a, b) => b.views - a.views);
+                } else if (filterType !== 'all' && filterType) {
+                    // Filter by Category
+                    filtered = allArticles.filter(art => 
+                        art.category.toLowerCase().includes(filterType.toLowerCase())
+                    );
+                }
+
+                displayArticles(filtered);
+            });
         });
     }
 
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const filter = btn.dataset.filter;
-            const filtered = filter === 'all' ? articlesData : articlesData.filter(art => art.type === filter);
-            renderArticles(filtered);
-        });
-    });
+    fetchPublications();
 
-    // --- D. Navigation & Mobile Drawer ---
+    // --- C. NAVIGATION ACTIVE STATE ---
+    const navLinks = document.querySelectorAll('.nav-item');
+    const path = window.location.pathname;
+    const isPubPage = path.includes('publications.html');
+
+    if (isPubPage) {
+        navLinks.forEach(link => {
+            if (link.getAttribute('href').includes('publications.html')) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    } else {
+        const handleScroll = () => {
+            let current = "";
+            const sections = document.querySelectorAll('section, header#home');
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.pageYOffset >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                const href = link.getAttribute('href');
+                if (current && href.includes(current)) link.classList.add('active');
+            });
+        };
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+    }
+
+    // --- D. Navigation Drawer ---
     const navToggle = document.getElementById('navToggle');
     const navDrawer = document.getElementById('navDrawer');
     const closeDrawer = document.getElementById('closeDrawer');
-    
+
     if (navToggle) {
         navToggle.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -129,79 +203,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (closeDrawer) closeDrawer.addEventListener('click', () => navDrawer.classList.remove('open'));
 
-    // --- E. Scroll Effects (Navbar Background & Active State) ---
+    // --- E. Navbar Background on Scroll ---
     window.addEventListener('scroll', () => {
         const header = document.getElementById('mainHeader');
         if (header) header.classList.toggle('scrolled', window.scrollY > 50);
-
-        const sections = document.querySelectorAll('section');
-        const navLinks = document.querySelectorAll('.nav-item');
-        
-        let current = "";
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            if (window.pageYOffset >= sectionTop - 100) {
-                current = section.getAttribute('id');
-            }
-        });
-
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href').includes(current)) {
-                link.classList.add('active');
-            }
-        });
     });
 
-    // --- F. Form Submission Logic ---
+    // --- F. Contact Form ---
     const contactForm = document.getElementById("contactForm");
-    const formSuccess = document.getElementById("formSuccess");
-    const submitBtn = document.getElementById("submitBtn");
-
     if (contactForm) {
-        contactForm.addEventListener("submit", async (event) => {
-            event.preventDefault(); 
-            submitBtn.textContent = "Sending...";
-            submitBtn.disabled = true;
+        contactForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("submitBtn");
+            btn.textContent = "Sending...";
+            btn.disabled = true;
 
             try {
-                const response = await fetch(contactForm.action, {
+                const res = await fetch(contactForm.action, {
                     method: "POST",
                     body: new FormData(contactForm),
                     headers: { 'Accept': 'application/json' }
                 });
-
-                if (response.ok) {
+                if (res.ok) {
                     contactForm.style.display = "none";
-                    formSuccess.style.display = "block";
-                } else {
-                    throw new Error("Submission failed");
+                    document.getElementById("formSuccess").style.display = "block";
                 }
-            } catch (error) {
-                alert("Something went wrong. Please try again.");
-                submitBtn.textContent = "Send Request";
-                submitBtn.disabled = false;
+            } catch (err) {
+                alert("Error sending message.");
+                btn.textContent = "Send Request";
+                btn.disabled = false;
             }
         });
     }
 });
-
-// --- 3. Global Functions (Reset & Sliders) ---
-window.resetForm = function() {
-    const contactForm = document.getElementById("contactForm");
-    const formSuccess = document.getElementById("formSuccess");
-    const submitBtn = document.getElementById("submitBtn");
-
-    if (formSuccess) formSuccess.style.display = "none";
-    if (contactForm) {
-        contactForm.style.display = "block";
-        contactForm.reset();
-    }
-    if (submitBtn) {
-        submitBtn.textContent = "Send Request";
-        submitBtn.disabled = false;
-    }
-};
 
 function moveSlide(direction) {
     const slides = document.querySelectorAll('.project-slide');
