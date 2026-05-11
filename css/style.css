@@ -127,7 +127,7 @@ a {
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
-  margin-left: 30px;
+  margin-left: 20px;
   transition: color 0.4s ease;
 }
 
@@ -162,6 +162,8 @@ a {
   height: 0;
 }
 }
+
+
 
 /* ==========================================================================
    BUTTONS
@@ -388,6 +390,64 @@ a {
   width: 30px;
   border-radius: 10px;
 }
+/* fff */
+/* Hero Text Container */
+.hero-content {
+    max-width: 900px;
+    padding: 0 2rem;
+    text-align: left; /* Alignment usually feels more professional for corporate sites */
+}
+
+/* The small Tag above the H1 */
+.hero-tag {
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color:var(--gold); /* Amber Gold */
+    margin-bottom: 1.5rem;
+    border-left: 3px solid var(--gold);
+    padding-left: 15px;
+}
+
+/* The Main Title */
+.main-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem); /* Responsive sizing */
+    font-weight: 800;
+    line-height: 1.1;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.main-title .accent {
+    color: var(--gold);
+    position: relative;
+}
+
+/* The Description */
+.hero-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #e2e8f0; /* Light slate gray */
+    max-width: 650px;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+/* Visual improvement for the slides */
+.slide {
+    display: flex;
+    align-items: center; /* Vertically centers the text */
+    justify-content: flex-start; /* Aligns to the left */
+    padding:0 60px;
+}
+
 
 /* ==========================================================================
    MISSION & ETHOS SECTION
@@ -845,71 +905,159 @@ a {
 /* ==========================================================================
    PARTNERSHIPS SECTION
    ========================================================================== */
+/* 
+/* fff */
+/* Global Partnership Section Refinement */
 .partnerships-section {
-  padding: 100px 0;
-  background: #f8fafc;
+    background-color: #f8fafc; /* Very light slate to separate from white sections */
+    padding: 100px 0;
 }
 
+/* Tagline matching the Hero Section */
+.partnerships-section .tag {
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #d97706; /* Amber-600 */
+    margin-bottom: 1rem;
+    border-left: 3px solid #d97706;
+    padding-left: 12px;
+}
+
+.partnerships-section h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+}
+
+.section-lead {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    color: #64748b;
+    max-width: 700px;
+    line-height: 1.7;
+}
+
+/* Partnership Cards - Professional Grid */
 .partnerships-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 50px;
 }
 
 .partnership-card {
-  background: #fff;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 4px;
+    border-top: 4px solid #0f172a; /* Navy accent top border */
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    transition: transform 0.3s ease;
 }
 
+.partnership-card:hover {
+    transform: translateY(-5px);
+}
+
+.partnership-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #0f172a;
+    margin-bottom: 1rem;
+}
+
+.partnership-card p {
+    font-family: 'Inter', sans-serif;
+    color: #475569;
+    line-height: 1.8;
+}
+
+/* Professional Trust Bar (Logos) */
 .partners-logos {
-  margin-top: 20px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--gold);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
 }
 
-.services-list-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
+.partners-logos span {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
 }
 
-.service-box {
-  background: var(--navy);
-  color: #fff;
-  padding: 30px;
-  border-radius: 8px;
+/* --- Responsive Adjustments --- */
+
+/* For Tablets and Mobile (Max-width: 1024px) */
+@media (max-width: 1024px) {
+    .nav-container, .container {
+        padding: 0 20px; /* Reduces side padding on smaller screens */
+    }
+
+    .main-title {
+        font-size: 3rem; /* Scales down the massive hero title */
+    }
+
+    .partnerships-grid {
+        grid-template-columns: 1fr; /* Stacks the partnership cards vertically */
+    }
 }
 
-.service-box h4 {
-  color: var(--gold);
-  margin-bottom: 15px;
-}
-
-.service-box ul {
-  list-style: none;
-}
-
-.service-box ul li {
-  margin-bottom: 10px;
-  padding-left: 20px;
-  position: relative;
-}
-
-.service-box ul li::before {
-  content: "✓";
-  position: absolute;
-  left: 0;
-  color: var(--gold);
-}
-
+/* For Mobile Devices (Max-width: 768px) */
 @media (max-width: 768px) {
-  .partnerships-grid, .services-list-grid {
-    grid-template-columns: 1fr;
-  }
+    /* Hero Section Adjustments */
+    .hero-content {
+        text-align: center; /* Centers text for a cleaner mobile look */
+        padding: 0 1rem;
+    }
+
+    .hero-tag {
+        border-left: none;
+        border-bottom: 2px solid #fbbf24;
+        padding-left: 0;
+        padding-bottom: 5px;
+    }
+
+    .main-title {
+        font-size: 2.2rem; /* Further reduces size for phone screens */
+        line-height: 1.2;
+    }
+
+    .hero-sub {
+        font-size: 0.95rem;
+        margin: 0 auto 2rem auto;
+    }
+
+    /* Partnership Section Adjustments */
+    .partnerships-section {
+        padding: 60px 0; /* Reduces vertical spacing */
+    }
+
+    .partnerships-section h2 {
+        font-size: 1.8rem; /* Smaller heading for mobile */
+    }
+
+    .partnership-card {
+        padding: 25px; /* Tighter padding inside cards */
+    }
+
+    /* Trust Bar (Logos) */
+    .partners-logos {
+        justify-content: center; /* Centers partner names on mobile */
+        gap: 10px;
+    }
 }
 
 /* ==========================================================================

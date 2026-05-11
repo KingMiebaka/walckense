@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (articleId) {
         const storageKey = `article_view_${articleId}`;
-        const baseViewsMap = { "1": 124, "2": 89 };
+        const baseViewsMap = { "1": 0, "2": 0 };
         
         let currentViews = localStorage.getItem(storageKey);
         
