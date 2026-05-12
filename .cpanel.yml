@@ -1,9 +1,0 @@
----
-deployment:
-  tasks:
-    - export DEPLOYPATH=/home/walckens/public_html/
-    - /bin/cp index.html $DEPLOYPATH
-    - /bin/cp publications.html $DEPLOYPATH
-    - /bin/cp -r css $DEPLOYPATH
-    - /bin/cp -r js $DEPLOYPATH
-    - /bin/cp -r assets $DEPLOYPATH
