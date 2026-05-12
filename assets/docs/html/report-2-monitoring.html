@@ -34,9 +34,14 @@
                         <p class="text-[10px] text-slate-500 font-medium tracking-tight">Published: May 11, 2026</p>
                     </div>
                 </div>
-                <div class="flex gap-6 text-right">
-                    <div class="hidden sm:block text-[9px] font-bold text-slate-400 uppercase tracking-widest">Accessed <span id="access-time" class="text-slate-900 ml-1">--:--</span></div>
-                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Engagement <span id="view-count" class="text-amber-600 ml-1">0</span> Views</div>
+
+                <div class="flex items-center gap-6">
+                    <a href="../pdf/report-2-monitoring.pdf" download class="group flex items-center gap-2 text-slate-400 hover:text-amber-600 transition-colors">
+                        <span class="text-[9px] font-bold uppercase tracking-widest">Technical PDF</span>
+                        <i class="fa-solid fa-file-pdf text-sm"></i>
+                    </a>
+                    
+                    <div class="hidden sm:block text-[9px] font-bold text-slate-400 uppercase tracking-widest">Engagement <span id="view-count" class="text-amber-600 ml-1">0</span></div>
                 </div>
             </div>
         </header>
@@ -69,5 +74,13 @@
     </footer>
 
     <script src="../../../js/report-counter.js"></script>
+    <script>
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+        });
+    </script>
 </body>
 </html>

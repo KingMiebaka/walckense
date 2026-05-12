@@ -1,86 +1,125 @@
 /**
  * Walckense Engineering - Technical Publications Hub
- * Manages article rendering with 0-base view counts
+ * FEATURE: Instant Load + Verified View Reveal
  */
+
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJIwgpElrEDUBxSH4gXxbop_0VlUcvp1vCgEKb9uncOj3kGPGTR59ypgb3p_7TCgzb/exec";
 
 const articles = [
     {
         id: 1,
         title: "Climate-Resilient Water Infrastructure for Emerging Economies",
-        date: "May 10, 2026",
-        publishTime: "09:45 AM",
-        baseViews: 0, 
+        date: "2026-05-10",
+        displayDate: "May 10, 2026",
         category: "Sustainability",
         excerpt: "An in-depth look at hydraulic design resilience and sustainability principles from the PTDF 2500 m³/day project site.",
         url: "assets/docs/html/report-1-ptdf.html",
-        isRecent: true,
-        isPopular: true
+        cloudKey: "report_01"
     },
     {
         id: 2,
         title: "Why Digital Monitoring Matters in Produced Water Treatment",
-        date: "May 11, 2026",
-        publishTime: "10:30 AM",
-        baseViews: 0, 
+        date: "2026-05-11",
+        displayDate: "May 11, 2026",
         category: "Innovation",
         excerpt: "Design Resilience, Material Selection, and Operational Intelligence from the PTDF 2500 m³/day Water Treatment Project.",
         url: "assets/docs/html/report-2-monitoring.html",
-        isRecent: true,
-        isPopular: false
+        cloudKey: "report_02"
     }
 ];
 
 const articleGrid = document.getElementById('articleGrid');
 
+// 1. Instant Rendering (Views Container is Hidden)
 function renderArticles(data) {
     if (!articleGrid) return;
     articleGrid.innerHTML = '';
-    
-    data.forEach(article => {
-        const storageKey = `article_view_${article.id}`;
-        const liveViews = localStorage.getItem(storageKey) || article.baseViews;
 
-        const card = `
-            <article class="group bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="px-3 py-1 bg-amber-50 text-amber-700 text-[10px] font-black uppercase tracking-wider rounded-md">
-                            ${article.category}
-                        </span>
-                        <div class="text-right">
-                            <span class="block text-slate-400 text-[9px] font-bold uppercase tracking-widest">${article.date}</span>
-                            <span class="text-slate-400 text-[11px] font-medium italic">
-                                <i class="far fa-eye mr-1"></i> ${liveViews} Views
-                            </span>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-amber-600 transition-colors leading-tight">
-                        ${article.title}
-                    </h3>
-                    <p class="text-slate-500 text-sm leading-relaxed mb-6">
-                        ${article.excerpt}
-                    </p>
-                </div>
-                
-                <div class="flex items-center justify-between pt-4 border-t border-slate-50">
-                    <span class="text-slate-400 text-[10px] font-bold uppercase tracking-tighter">
-                        <i class="far fa-clock mr-1 text-amber-600"></i> Published ${article.publishTime}
+    data.forEach(article => {
+        articleGrid.innerHTML += `
+            <div class="bg-white border border-slate-100 rounded-2xl p-8 hover:shadow-2xl transition-all flex flex-col h-full">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="px-3 py-1 bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-widest rounded-md border border-slate-100">
+                        ${article.category}
                     </span>
-                    <a href="${article.url}" class="inline-flex items-center text-sm font-bold text-slate-900 hover:text-amber-600 transition-all">
-                        Read Analysis <i class="fas fa-chevron-right ml-2 text-[10px]"></i>
+                    
+                    <span id="container-${article.cloudKey}" class="text-slate-400 text-[10px] font-medium opacity-0 transition-opacity duration-700">
+                        <i class="far fa-eye mr-1"></i> <span id="num-${article.cloudKey}">0</span> Views
+                    </span>
+                </div>
+                <h3 class="text-xl leading-tight mb-4 font-bold text-slate-900">${article.title}</h3>
+                <p class="text-slate-500 text-sm mb-8 grow leading-relaxed">${article.excerpt}</p>
+                <div class="pt-6 border-t border-slate-50 flex justify-between items-center">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${article.displayDate}</div>
+                    <a href="${article.url}" 
+                       data-key="${article.cloudKey}"
+                       class="read-trigger text-[11px] font-extrabold uppercase tracking-widest text-slate-900 hover:text-blue-700 flex items-center gap-2">
+                        Read Analysis <i class="fas fa-arrow-right text-[9px]"></i>
                     </a>
                 </div>
-            </article>
+            </div>
         `;
-        articleGrid.innerHTML += card;
     });
 }
 
+// 2. Verified Background Fetch (The Reveal)
+async function updateViewCounts() {
+    articles.forEach(async (article) => {
+        try {
+            const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=get&key=${article.cloudKey}`, {
+                method: 'GET',
+                redirect: 'follow'
+            });
+            const data = await res.json();
+            
+            const countSpan = document.getElementById(`num-${article.cloudKey}`);
+            const container = document.getElementById(`container-${article.cloudKey}`);
+            
+            if (countSpan && container) {
+                countSpan.innerText = data.value || 0;
+                // Make the entire phrase "00 Views" visible only now
+                container.classList.remove('opacity-0'); 
+                localStorage.setItem(`v_${article.cloudKey}`, data.value || 0);
+            }
+        } catch (e) {
+            console.warn("View verification pending for " + article.cloudKey);
+        }
+    });
+}
+
+// 3. Sorting & Filtering
+function setActiveFilter(activeId) {
+    ['filter-all', 'filter-recent', 'filter-popular'].forEach(id => {
+        document.getElementById(id)?.classList.remove('filter-active');
+    });
+    document.getElementById(activeId)?.classList.add('filter-active');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    renderArticles(articles);
-    
-    // Filter Listeners
-    document.getElementById('filter-all')?.addEventListener('click', () => renderArticles(articles));
-    document.getElementById('filter-recent')?.addEventListener('click', () => renderArticles(articles.filter(a => a.isRecent)));
-    document.getElementById('filter-popular')?.addEventListener('click', () => renderArticles(articles.filter(a => a.isPopular)));
+    renderArticles(articles); 
+    updateViewCounts();       
+
+    document.getElementById('filter-all')?.addEventListener('click', () => {
+        setActiveFilter('filter-all');
+        renderArticles(articles);
+        updateViewCounts(); // Refresh visibility for filtered items
+    });
+
+    document.getElementById('filter-recent')?.addEventListener('click', () => {
+        setActiveFilter('filter-recent');
+        const sorted = [...articles].sort((a, b) => new Date(b.date) - new Date(a.date));
+        renderArticles(sorted);
+        updateViewCounts();
+    });
+
+    document.getElementById('filter-popular')?.addEventListener('click', () => {
+        setActiveFilter('filter-popular');
+        const sorted = [...articles].sort((a, b) => {
+            const vA = parseInt(localStorage.getItem(`v_${a.cloudKey}`) || 0);
+            const vB = parseInt(localStorage.getItem(`v_${b.cloudKey}`) || 0);
+            return vB - vA;
+        });
+        renderArticles(sorted);
+        updateViewCounts();
+    });
 });

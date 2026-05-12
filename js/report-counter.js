@@ -1,41 +1,58 @@
 /**
- * Global Report Counter
- * Detects article ID from URL and updates localStorage
+ * WALCKENSE ENGINEERING - Individual Report Analytics
  */
-document.addEventListener('DOMContentLoaded', () => {
+
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJIwgpElrEDUBxSH4gXxbop_0VlUcvp1vCgEKb9uncOj3kGPGTR59ypgb3p_7TCgzb/exec";
+
+async function trackAndRevealViews() {
     const path = window.location.pathname;
     let articleId = null;
 
-    // Detect ID based on the filename in the URL
-    if (path.includes('report-1')) articleId = "1";
-    if (path.includes('report-2')) articleId = "2";
+    if (path.includes('report-1-ptdf')) articleId = "report_01";
+    if (path.includes('report-2-monitoring')) articleId = "report_02";
 
+    const display = document.getElementById('view-count');
+    
     if (articleId) {
-        const storageKey = `article_view_${articleId}`;
-        const baseViewsMap = { "1": 0, "2": 0 };
-        
-        let currentViews = localStorage.getItem(storageKey);
-        
-        if (!currentViews) {
-            currentViews = baseViewsMap[articleId];
-        } else {
-            currentViews = parseInt(currentViews) + 1;
+        // 1. Send the view 'hit' to Google in the background
+        fetch(`${GOOGLE_SCRIPT_URL}?action=hit&key=${articleId}`, { mode: 'no-cors' });
+
+        try {
+            // 2. Fetch the actual verified number
+            const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=get&key=${articleId}`, {
+                method: 'GET',
+                redirect: 'follow'
+            });
+            const data = await response.json();
+            
+            if (display) {
+                // Update text first
+                display.innerText = `${data.value || 0} Views`;
+                // Make the whole phrase visible only after verification
+                display.classList.remove('opacity-0');
+                localStorage.setItem(`v_${articleId}`, data.value || 0);
+            }
+        } catch (e) {
+            console.error("Verification failed. Keeping counter hidden.");
         }
-
-        // Save back to browser memory
-        localStorage.setItem(storageKey, currentViews);
-        
-        // Update the UI display if the element exists
-        const viewDisplay = document.getElementById('view-count');
-        if (viewDisplay) viewDisplay.innerText = currentViews;
     }
+}
 
-    // Scroll Progress Bar
+document.addEventListener('DOMContentLoaded', () => {
+    // Initial hidden state for the counter
+    const viewDisplay = document.getElementById('view-count');
+    if (viewDisplay) {
+        viewDisplay.classList.add('opacity-0', 'transition-opacity', 'duration-700');
+    }
+    
+    trackAndRevealViews();
+
+    // Progress bar scroll logic
     window.addEventListener('scroll', () => {
         const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
         const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
         const scrolled = (winScroll / height) * 100;
-        const progressBar = document.getElementById("progress-bar");
-        if (progressBar) progressBar.style.width = scrolled + "%";
+        const bar = document.getElementById("progress-bar");
+        if (bar) bar.style.width = scrolled + "%";
     });
 });
