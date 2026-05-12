@@ -341,10 +341,13 @@ a {
   background-position: center;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: center;
+    padding:0 60px;
+
   color: #fff;
 }
+
 
 .slide.active {
   opacity: 1;
@@ -441,11 +444,16 @@ a {
 }
 
 /* Visual improvement for the slides */
-.slide {
-    display: flex;
-    align-items: center; /* Vertically centers the text */
-    justify-content: flex-start; /* Aligns to the left */
-    padding:0 60px;
+
+
+@media (max-width: 768px) {
+  .hero-content{
+    text-align:left !important;
+  }
+  .slide{
+  padding: 0 !important;
+}
+
 }
 
 
