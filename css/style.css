@@ -45,6 +45,18 @@ a {
   padding: 0 60px;
 }
 
+.main-title {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.section-header h2 {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+
 @media (max-width: 768px) {
   section {
     padding: 80px 10px !important;
@@ -307,6 +319,11 @@ a {
   justify-content: space-between;
 }
 
+@media (max-width: 768px) {
+    .nav-container, .container {
+        padding: 0 !important;
+    }
+}
 /* } */
 
 @keyframes blink {
@@ -371,7 +388,7 @@ a {
 
 .hero-dots {
   position: absolute;
-  bottom: 40px;
+  bottom: 50px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -455,7 +472,12 @@ a {
 }
 
 }
-
+@media (max-width: 768px) {
+    .hero-sub {
+        
+        margin: 0 !important;
+    }
+}
 
 /* ==========================================================================
    MISSION & ETHOS SECTION
@@ -1665,6 +1687,12 @@ a {
     justify-content: center;
   }
 
+  .f-brand p {
+  
+    max-width: 500px;
+    padding: 10px;
+}
+
   .f-links a {
     margin-left: 0;
   }
@@ -1686,16 +1714,6 @@ a {
 
 
 
-.main-title {
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.section-header h2 {
-  font-weight: 700;
-  text-transform: uppercase;
-}
 
 .nav-item {
   font-weight: 600;
